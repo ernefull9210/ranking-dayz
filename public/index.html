@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranking de Jugadores DayZ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f7fc;
+      color: #333;
+    }
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 0;
+      text-align: center;
+    }
+    main {
+      padding: 20px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin: 20px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    tr:hover {
+      background-color: #ddd;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Ranking de Jugadores DayZ</h1>
+  </header>
+  <main>
+    <input type="text" id="searchInput" placeholder="Buscar por nombre..." onkeyup="filterTable()">
+    <table id="rankingTable">
+      <thead>
+        <tr>
+          <th>Jugador</th>
+          <th>Kills</th>
+          <th>Muertes</th>
+          <th>Distancia más larga</th>
+          <th>Zombies Asesinados</th>
+        </tr>
+      </thead>
+      <tbody id="ranking-body"></tbody>
+    </table>
+  </main>
+  <script>
+    function filterTable() {
+      const input = document.getElementById('searchInput');
+      const filter = input.value.toLowerCase();
+      const rows = document.querySelectorAll('#rankingTable tbody tr');
+      rows.forEach(row => {
+        const nameCell = row.cells[0];
+        const name = nameCell.textContent || nameCell.innerText;
+        row.style.display = name.toLowerCase().includes(filter) ? '' : 'none';
+      });
+    }
+
+    fetch('/api/players')
+      .then(response => response.json())
+      .then(players => {
+        const tbody = document.getElementById('ranking-body');
+        players.forEach(player => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${player.name}</td>
+            <td>${player.kills}</td>
+            <td>${player.deaths}</td>
+            <td>${player.longestKill} m</td>
+            <td>${player.zombiesKilled}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      })
+      .catch(error => console.error('Error al cargar los datos:', error));
+  </script>
+</body>
+</html>
+
